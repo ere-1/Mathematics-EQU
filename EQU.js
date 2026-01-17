@@ -41,10 +41,10 @@ function quadraticEquetion(a, b, c) {
   let graphLink = `https://www.geogebra.org/graphing?command=${expr}`;
 
   if (delta == 0) {
-    let root = (-b + delta ** 0.5) / (2 * a);
+    let root = (-b + Math.sqrt(delta)) / (2 * a);
     let theSignZero = root;
-    theSignNeg = a > 0 ? "Fi" : `R - [${root}]`;
-    theSignPos = a > 0 ? `R - [${root}]` : "Fi";
+    theSignNeg = a > 0 ? "Fi" : `R - {${root}}`;
+    theSignPos = a > 0 ? `R - {${root}}` : "Fi";
     return {
       delta,
       root,
@@ -55,24 +55,41 @@ function quadraticEquetion(a, b, c) {
       axle,
       graphLink,
     };
-  } else {
-    let root1 = (-b + delta ** 0.5) / (2 * a);
-    let root2 = (-b - delta ** 0.5) / (2 * a);
+  } else if (delta > 0) {
+    let root1 = (-b + Math.sqrt(delta)) / (2 * a);
+    let root2 = (-b - Math.sqrt(delta)) / (2 * a);
     let theSignZero = root1 + "," + root2;
-    if (delta > 0) {
-      signOfFunction = "different real roots";
-      theSignPos = a > 0 ? `R - [${root1}, ${root2}]` : `]${root1}, ${root2}[`;
-      theSignNeg = a > 0 ? `]${root1}, ${root2}[` : `R - [${root1}, ${root2}]`;
-    } else {
-      signOfFunction = "different imagine roots";
-      theSignNeg = a > 0 ? "Fi" : "R";
-      theSignPos = a > 0 ? "R" : "Fi";
-      theSignZero = "Fi";
-    }
+    signOfFunction = "different real roots";
+    theSignPos = a > 0 ? `R - [${root1}, ${root2}]` : `]${root1}, ${root2}[`;
+    theSignNeg = a > 0 ? `]${root1}, ${root2}[` : `R - [${root1}, ${root2}]`;
+
     return {
       delta,
       root1,
       root2,
+      signOfFunction,
+      theSignPos,
+      theSignNeg,
+      theSignZero,
+      axle,
+      graphLink,
+    };
+  } else {
+    let realPart = (-b / (2 * a)).toFixed(3);
+    let imaginaryPart = (Math.sqrt(-delta) / (2 * a)).toFixed(3);
+    let root1 = `${realPart} + ${imaginaryPart}i`;
+    let root2 = `${realPart} - ${imaginaryPart}i`;
+    let root = root1 + ", " + root2;
+
+
+    signOfFunction = "different imagine roots";
+    theSignNeg = a > 0 ? "Fi" : "R";
+    theSignPos = a > 0 ? "R" : "Fi";
+    theSignZero = "Fi";
+
+    return {
+      delta,
+      root,
       signOfFunction,
       theSignPos,
       theSignNeg,
@@ -91,29 +108,24 @@ async function main() {
        =>`);
 
   if (equ == "1") {
-    let a = Number(await promptUser("enter a value: \n=>"));
-    let b = Number(await promptUser("enter b value: \n=>"));
-    let c = Number(await promptUser("enter c value: \n=>"));
+    let a = eval(await promptUser("enter a value: \n=>"));
+    let b = eval(await promptUser("enter b value: \n=>"));
+    let c = eval(await promptUser("enter c value: \n=>"));
     let theEquRoots = quadraticEquetion(a, b, c);
-    if (theEquRoots.length == 8) {
-      console.log("the Discriminant " + theEquRoots.delta);
-      console.log("Root is " + theEquRoots.root);
-      console.log("the Sign of Function is " + theEquRoots.signOfFunction);
-      console.log("function sign is positive when its " + theEquRoots.theSignPos);
-      console.log("function sign is negative when its " + theEquRoots.theSignNeg);
-      console.log("function sign is zero when its " + theEquRoots.theSignZero);
-      console.log("function axle " + theEquRoots.axle);
-      console.log("function graph link is " + theEquRoots.graphLink);
+    console.log("Discriminant: " + theEquRoots.delta);
+
+    if (theEquRoots.root !== undefined) {
+      console.log("Root: " + theEquRoots.root);
     } else {
-      console.log("the Discriminant " + theEquRoots.delta);
-      console.log("Roots is " + theEquRoots.root1 + "," + theEquRoots.root2);
-      console.log("the Sign of Function is " + theEquRoots.signOfFunction);
-      console.log("function sign is positive when its " + theEquRoots.theSignPos);
-      console.log("function sign is negative when its " + theEquRoots.theSignNeg);
-      console.log("function sign is zero when its " + theEquRoots.theSignZero);
-      console.log("function axle " + theEquRoots.axle);
-      console.log("function graph link is " + theEquRoots.graphLink);
+      console.log("Roots: " + theEquRoots.root1 + ", " + theEquRoots.root2);
     }
+
+    console.log("Sign of the function: " + theEquRoots.signOfFunction);
+    console.log("Function is positive for: " + theEquRoots.theSignPos);
+    console.log("Function is negative for: " + theEquRoots.theSignNeg);
+    console.log("Function is zero at: " + theEquRoots.theSignZero);
+    console.log("Vertex / minimum value: " + theEquRoots.axle);
+    console.log("Function graph link: " + theEquRoots.graphLink);
   }
 }
 main();
